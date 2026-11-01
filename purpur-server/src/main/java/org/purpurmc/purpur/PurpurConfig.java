@@ -623,4 +623,10 @@ public class PurpurConfig {
     private static void generateEndVoidRings() {
         generateEndVoidRings = getBoolean("settings.generate-end-void-rings", generateEndVoidRings);
     }
+
+    public static int itemDespawnTimeTicks = 400;
+    private static void itemDespawnTime() {
+        int seconds = getInt("settings.item-despawn-time-seconds", 20);
+        itemDespawnTimeTicks = seconds <= 0 ? 0 : Math.min(seconds, Integer.MAX_VALUE / 20) * 20;
+    }
 }

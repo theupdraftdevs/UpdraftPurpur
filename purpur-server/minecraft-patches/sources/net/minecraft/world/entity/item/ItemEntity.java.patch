@@ -13,6 +13,15 @@
  
      public ItemEntity(final EntityType<? extends ItemEntity> type, final Level level) {
          super(type, level);
+@@ -138,1 +_,1 @@
+-        if (!this.level().isClientSide() && this.age >= this.despawnRate) {// Paper - Alternative item-despawn-rate
++        if (!this.level().isClientSide() && this.age >= this.getEffectiveDespawnRate()) {// Paper - Alternative item-despawn-rate // Purpur - Global item despawn time
+@@ -225,1 +_,1 @@
+-            if (!this.level().isClientSide() && this.age >= this.despawnRate) { // Spigot // Paper - Alternative item-despawn-rate
++            if (!this.level().isClientSide() && this.age >= this.getEffectiveDespawnRate()) { // Spigot // Paper - Alternative item-despawn-rate // Purpur - Global item despawn time
+@@ -278,1 +_,1 @@
+-        return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && item.getCount() < item.getMaxStackSize(); // Paper - Alternative item-despawn-rate
++        return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.getEffectiveDespawnRate() && item.getCount() < item.getMaxStackSize(); // Paper - Alternative item-despawn-rate // Purpur - Global item despawn time
 @@ -334,7 +_,16 @@
  
      @Override
@@ -31,7 +40,7 @@
              return false;
          }
  
-@@ -516,6 +_,12 @@
+@@ -516,6 +_,16 @@
      public void setItem(final ItemStack itemStack) {
          this.getEntityData().set(DATA_ITEM, itemStack);
          this.despawnRate = this.level().paperConfig().entities.spawning.altItemDespawnRate.enabled ? this.level().paperConfig().entities.spawning.altItemDespawnRate.items.getOrDefault(itemStack.getItem(), this.level().spigotConfig.itemDespawnRate) : this.level().spigotConfig.itemDespawnRate; // Paper - Alternative item-despawn-rate
@@ -42,5 +51,10 @@
 +        if (level().purpurConfig.itemImmuneToLightning.contains(itemStack.getItem())) immuneToLightning = true;
 +        // level end - Item entity immunities
      }
+
++    private int getEffectiveDespawnRate() {
++        int globalRate = org.purpurmc.purpur.PurpurConfig.itemDespawnTimeTicks;
++        return globalRate > 0 ? Math.min(this.despawnRate, globalRate) : this.despawnRate;
++    }
  
      public void setTarget(final @Nullable UUID target) {
