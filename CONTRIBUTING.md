@@ -1,18 +1,10 @@
-Contributing to Purpur
-==========================
-Purpur is happy you're willing to contribute to our projects. We are usually
-very lenient with all submitted PRs, but there are still some guidelines you
-can follow to make the approval process go more smoothly.
+Contributing to Updraft
+========================
+Updraft is maintained by Updraft-Network and builds on Paper and Purpur. Contributions to this repository should follow the patch workflow below so upstream changes remain easy to track and update.
 
-## Use a Personal Fork and not an Organization
+## Working on Updraft
 
-Purpur will routinely modify your PR, whether it's a quick rebase or to take care
-of any minor nitpicks we might have. Often, it's better for us to solve these
-problems for you than make you go back and forth trying to fix them yourself.
-
-Unfortunately, if you use an organization for your PR, it prevents Purpur from
-modifying it. To avoid this, please do not use repositories on organizations
-for PRs.
+Create branches and pull requests against the UpdraftPurpur repository. Upstream changes from Purpur are maintained separately and incorporated through the upstream update process.
 
 ## Requirements
 
@@ -21,12 +13,12 @@ which can be obtained in (most) package managers such as `apt` (Debian / Ubuntu;
 you will most likely use this for WSL), `homebrew` (macOS / Linux), and more:
 
 - `git` (package `git` everywhere);
-- A Java 21 or later JDK (packages vary, use Google/DuckDuckGo/etc.).
+- A Java 25 JDK (packages vary, use Google/DuckDuckGo/etc.).
     - [Adoptium](https://adoptium.net/) has builds for most operating systems.
-    - Purpur requires JDK 21 to build, however, makes use of Gradle's
+    - Updraft requires JDK 25 to build, however, makes use of Gradle's
       [Toolchains](https://docs.gradle.org/current/userguide/toolchains.html)
       feature to allow building with only JRE 11 or later installed. (Gradle will
-      automatically provision JDK 21 for compilation if it cannot find an existing
+      automatically provision JDK 25 for compilation if it cannot find an existing
       install).
 
 If you're on Windows, check
@@ -36,7 +28,7 @@ If you're compiling with Docker, you can use Adoptium's
 [`eclipse-temurin`](https://hub.docker.com/_/eclipse-temurin/) images like so:
 
 ```console
-# docker run -it -v "$(pwd)":/data --rm eclipse-temurin:21.0.5_11-jdk bash
+# docker run -it -v "$(pwd)":/data --rm eclipse-temurin:25-jdk bash
 Pulling image...
 
 root@abcdefg1234:/# javac -version
@@ -203,7 +195,7 @@ fixup method.
 ## Rebasing PRs
 
 Steps to rebase a PR to include the latest changes from `main`.  
-These steps assume the `origin` remote is your fork of this repository and `upstream` is the official PurpurMC repository.
+These steps assume `origin` is the UpdraftPurpur repository and `upstream` is the official PurpurMC repository.
 
 1. Fetch the latest changes from upstream's main: `git fetch upstream`.
 1. Checkout your feature/fix branch and rebase on main: `git switch patch-branch && git rebase upstream/main`.
@@ -470,7 +462,7 @@ return this.level.purpurConfig.useInhabitedTime ? this.inhabitedTime : 0;
 
 ### Using the Purpur Test Plugin
 
-The Purpur project has a `test-plugin` module for easily testing out API changes
+The Updraft project has a `test-plugin` module for easily testing out API changes
 and additions. To use the test plugin, enable it in `test-plugin.settings.gradle.kts`,
 which will be generated after running Gradle at least once. After this, you can edit
 the test plugin, and run a server with the plugin using `./gradlew runDev` (or any

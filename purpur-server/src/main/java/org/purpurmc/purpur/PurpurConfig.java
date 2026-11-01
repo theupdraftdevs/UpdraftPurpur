@@ -40,15 +40,13 @@ import org.purpurmc.purpur.task.TPSBarTask;
 
 @SuppressWarnings("unused")
 public class PurpurConfig {
-    private static final String HEADER = "This is the main configuration file for Purpur.\n"
+    private static final String HEADER = "This is the main configuration file for Updraft.\n"
             + "As you can see, there's tons to configure. Some options may impact gameplay, so use\n"
             + "with caution, and make sure you know what each option does before configuring.\n"
             + "\n"
-            + "If you need help with the configuration or have any questions related to Purpur,\n"
-            + "join us in our Discord guild.\n"
+            + "Updraft is a performance-focused server software project by Updraft-Network.\n"
             + "\n"
-            + "Website: https://purpurmc.org \n"
-            + "Docs: https://purpurmc.org/docs \n";
+            + "Website: https://github.com/theupdraftdevs/UpdraftPurpur \n";
     private static File CONFIG_FILE;
     public static YamlConfiguration config;
 
@@ -72,7 +70,8 @@ public class PurpurConfig {
         verbose = getBoolean("verbose", false);
 
         commands = new HashMap<>();
-        commands.put("purpur", new PurpurCommand("purpur"));
+        commands.put("updraft", new PurpurCommand("updraft"));
+        commands.put("purpur", new PurpurCommand("purpur")); // Keep the Purpur command as a compatibility alias.
 
         version = getInt("config-version", 50);
         set("config-version", 50);
@@ -94,7 +93,7 @@ public class PurpurConfig {
 
     public static void registerCommands() {
         for (Map.Entry<String, Command> entry : commands.entrySet()) {
-            MinecraftServer.getServer().server.getCommandMap().register(entry.getKey(), "Purpur", entry.getValue());
+            MinecraftServer.getServer().server.getCommandMap().register(entry.getKey(), "Updraft", entry.getValue());
         }
     }
 

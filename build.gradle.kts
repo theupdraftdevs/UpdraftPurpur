@@ -124,8 +124,14 @@ tasks.register("printMinecraftVersion") {
     }
 }
 
-tasks.register("printPurpurVersion") {
+tasks.register("printUpdraftVersion") {
     doLast {
         println(project.version)
     }
+}
+
+tasks.register("printPurpurVersion") {
+    group = "help"
+    description = "Compatibility alias for printUpdraftVersion."
+    dependsOn("printUpdraftVersion")
 }
