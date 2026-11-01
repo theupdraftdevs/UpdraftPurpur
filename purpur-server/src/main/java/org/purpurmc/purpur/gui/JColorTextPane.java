@@ -1,20 +1,18 @@
 package org.purpurmc.purpur.gui;
 
-import com.google.common.collect.Sets;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import javax.swing.JTextPane;
-import javax.swing.Timer;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import java.util.Set;
-
 public class JColorTextPane extends JTextPane {
+    private static final int MAX_DOCUMENT_CHARACTERS = 1_000_000;
     private static final GUIColor DEFAULT_COLOR;
     static {
         DEFAULT_COLOR = UIManager.getSystemLookAndFeelClassName().equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
@@ -23,6 +21,11 @@ public class JColorTextPane extends JTextPane {
 
 
     public void append(String msg) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> append(msg));
+            return;
+        }
+
         // TODO: update to use adventure instead
         BaseComponent[] components = TextComponent.fromLegacyText(DEFAULT_COLOR.getCode() + msg, DEFAULT_COLOR.getChatColor());
         for (BaseComponent component : components) {
@@ -32,6 +35,9 @@ public class JColorTextPane extends JTextPane {
             }
 
             GUIColor guiColor = GUIColor.getColor(component.getColor());
+            if (guiColor == null) {
+                guiColor = DEFAULT_COLOR;
+            }
 
             StyleContext context = StyleContext.getDefaultStyleContext();
             AttributeSet attr = context.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, guiColor.getColor());
@@ -39,45 +45,24 @@ public class JColorTextPane extends JTextPane {
             attr = context.addAttribute(attr, StyleConstants.CharacterConstants.Italic, component.isItalic());
             attr = context.addAttribute(attr, StyleConstants.CharacterConstants.Underline, component.isUnderlined());
             attr = context.addAttribute(attr, StyleConstants.CharacterConstants.StrikeThrough, component.isStrikethrough());
-            //attr = context.addAttribute(attr, StyleConstants.CharacterConstants.Blink, component.isObfuscated()); // no such thing as Blink, sadly
 
             try {
                 int pos = getDocument().getLength();
                 getDocument().insertString(pos, text, attr);
-
-                if (component.isObfuscated()) {
-                    // dirty hack to blink some text
-                    Blink blink = new Blink(pos, text.length(), attr, context.addAttribute(attr, StyleConstants.Foreground, getBackground()));
-                    BLINKS.add(blink);
-                }
+                trimDocument();
             } catch (BadLocationException ignore) {
             }
         }
     }
 
-    private static final Set<Blink> BLINKS = Sets.newHashSet();
-    private static boolean SYNC_BLINK;
-
-    static {
-        new Timer(500, e -> {
-            SYNC_BLINK = !SYNC_BLINK;
-            BLINKS.forEach(Blink::blink);
-        }).start();
-    }
-
-    public class Blink {
-        private final int start, length;
-        private final AttributeSet attr1, attr2;
-
-        private Blink(int start, int length, AttributeSet attr1, AttributeSet attr2) {
-            this.start = start;
-            this.length = length;
-            this.attr1 = attr1;
-            this.attr2 = attr2;
+    private void trimDocument() throws BadLocationException {
+        int excess = getDocument().getLength() - MAX_DOCUMENT_CHARACTERS;
+        if (excess <= 0) {
+            return;
         }
 
-        private void blink() {
-            getStyledDocument().setCharacterAttributes(start, length, SYNC_BLINK ? attr1 : attr2, true);
-        }
+        String content = getDocument().getText(0, excess);
+        int newline = content.lastIndexOf('\n');
+        getDocument().remove(0, newline >= 0 ? newline + 1 : excess);
     }
 }

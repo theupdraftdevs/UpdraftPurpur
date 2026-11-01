@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -38,13 +37,14 @@ public abstract class BossBarTask extends BukkitRunnable {
     @Override
     public void cancel() {
         super.cancel();
-        new HashSet<>(this.bossbars.keySet()).forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
+        for (Map.Entry<UUID, BossBar> entry : this.bossbars.entrySet()) {
+            Player player = Bukkit.getPlayer(entry.getKey());
             if (player != null) {
-                removePlayer(player);
+                player.hideBossBar(entry.getValue());
             }
-        });
+        }
         this.bossbars.clear();
+        this.started = false;
     }
 
     public boolean removePlayer(Player player) {
@@ -78,7 +78,7 @@ public abstract class BossBarTask extends BukkitRunnable {
 
     public void start() {
         stop();
-        this.runTaskTimerAsynchronously(new MinecraftInternalPlugin(), 1, 1);
+        this.runTaskTimer(new MinecraftInternalPlugin(), 1, 1);
         started = true;
     }
 
